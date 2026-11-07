@@ -1,19 +1,22 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment.development';
-import { Filme } from '../models/filme';
+import { Cliente, Filme } from '../models/filme';
 
 @Injectable({
   providedIn: 'root'
 })
 export class Database {
   private readonly http = inject(HttpClient);
+  private readonly storageKey = 'ifdb_usuario';
 
   public filmes = signal<Filme[]>([]);
   public filmeSelecionado = signal<Filme | null>(null);
   public carregandoFilme = signal<boolean>(false);
   public isSaving = signal<boolean>(false);
+  public usuarioLogado = signal<Cliente | null>(null);
+  public isLoggedIn = computed(() => this.usuarioLogado() !== null);
 
   private get headers(): HttpHeaders {
     return new HttpHeaders({
@@ -25,7 +28,74 @@ export class Database {
   }
 
   constructor() {
+    this.restaurarSessao();
     this.carregarFilmes();
+  }
+
+  private restaurarSessao(): void {
+    try {
+      const salvo = localStorage.getItem(this.storageKey);
+      if (salvo) {
+        this.usuarioLogado.set(JSON.parse(salvo) as Cliente);
+      }
+    } catch {
+      localStorage.removeItem(this.storageKey);
+    }
+  }
+
+  async cadastrarCliente(cliente: { nome: string; email: string; pass: string }): Promise<boolean> {
+    this.isSaving.set(true);
+    try {
+      await firstValueFrom(
+        this.http.post(
+          `${environment.supabaseRestUrl}/clientes`,
+          {
+            nome: cliente.nome.trim(),
+            email: cliente.email.trim().toLowerCase(),
+            senha: cliente.pass
+          },
+          { headers: this.headers }
+        )
+      );
+      return true;
+    } catch (err) {
+      console.error('Erro POST cliente:', err);
+      return false;
+    } finally {
+      this.isSaving.set(false);
+    }
+  }
+
+  async fazerLogin(credenciais: { email: string; pass: string }): Promise<boolean> {
+    this.isSaving.set(true);
+    try {
+      const email = credenciais.email.trim().toLowerCase();
+      const url =
+        `${environment.supabaseRestUrl}/clientes` +
+        `?email=ilike.${encodeURIComponent(email)}` +
+        `&senha=eq.${encodeURIComponent(credenciais.pass)}` +
+        `&select=id,nome,email`;
+
+      const resultado = await firstValueFrom(this.http.get<Cliente[]>(url, { headers: this.headers }));
+      const cliente = resultado?.[0];
+      if (!cliente) {
+        return false;
+      }
+
+      this.usuarioLogado.set(cliente);
+      localStorage.setItem(this.storageKey, JSON.stringify(cliente));
+      return true;
+    } catch (err) {
+      console.error('Erro GET login:', err);
+      return false;
+    } finally {
+      this.isSaving.set(false);
+    }
+  }
+
+  logout(): void {
+    this.usuarioLogado.set(null);
+    localStorage.removeItem(this.storageKey);
   }
 
   carregarFilmes(): void {
