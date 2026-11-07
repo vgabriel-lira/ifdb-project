@@ -1,0 +1,89 @@
+<div class="min-h-screen bg-slate-950 px-4 py-10 font-sans text-slate-100">
+  <div class="mx-auto max-w-xl space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-2xl">
+    <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+      <h1 class="text-lg font-bold text-amber-400">Cadastrar novo filme</h1>
+      <a routerLink="/" class="text-xs text-zinc-400 hover:text-white">← Voltar</a>
+    </div>
+
+    <form (ngSubmit)="salvarFilme()" class="space-y-4">
+      <div>
+        <label class="mb-1 block text-xs font-semibold text-zinc-400">Título *</label>
+        <input
+          name="titulo"
+          [(ngModel)]="titulo"
+          required
+          placeholder="Ex: Pride and Prejudice"
+          class="w-full rounded border border-zinc-700 bg-zinc-950 p-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-amber-400 focus:outline-none"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="mb-1 block text-xs font-semibold text-zinc-400">Gênero</label>
+          <input
+            name="genero"
+            [(ngModel)]="genero"
+            placeholder="Ex: Drama"
+            class="w-full rounded border border-zinc-700 bg-zinc-950 p-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-amber-400 focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-xs font-semibold text-zinc-400">Ano *</label>
+          <input
+            type="number"
+            name="ano"
+            [(ngModel)]="ano"
+            required
+            placeholder="Ex: 2005"
+            class="w-full rounded border border-zinc-700 bg-zinc-950 p-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-amber-400 focus:outline-none"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label class="mb-1 block text-xs font-semibold text-zinc-400">URL da capa</label>
+        <input
+          type="url"
+          name="imagemUrl"
+          [(ngModel)]="imagemUrl"
+          placeholder="https://..."
+          class="w-full rounded border border-zinc-700 bg-zinc-950 p-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-amber-400 focus:outline-none"
+        />
+      </div>
+
+      <div>
+        <label class="mb-1 block text-xs font-semibold text-zinc-400">Sinopse</label>
+        <textarea
+          name="sinopse"
+          [(ngModel)]="sinopse"
+          rows="4"
+          placeholder="Breve resumo da trama..."
+          class="w-full resize-none rounded border border-zinc-700 bg-zinc-950 p-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-amber-400 focus:outline-none"
+        ></textarea>
+      </div>
+
+      @if (erro()) {
+        <p class="rounded border border-red-800 bg-red-950/40 px-3 py-2 text-xs text-red-300">{{ erro() }}</p>
+      }
+
+      <div class="flex gap-3 pt-2">
+        <button
+          type="submit"
+          [disabled]="database.isSaving()"
+          class="flex-1 rounded bg-amber-400 py-2.5 text-sm font-bold text-black transition-colors hover:bg-amber-300 disabled:opacity-50"
+        >
+          {{ database.isSaving() ? 'Salvando...' : 'Salvar no Supabase' }}
+        </button>
+
+        <button
+          type="button"
+          (click)="limparFormulario()"
+          class="rounded border border-zinc-700 px-4 py-2.5 text-sm font-bold text-zinc-300 transition-colors hover:bg-zinc-800"
+        >
+          Limpar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
