@@ -1,0 +1,61 @@
+<div class="min-h-screen bg-slate-950 px-4 py-10 font-sans text-slate-100">
+  <div class="mx-auto max-w-3xl space-y-6">
+    <a routerLink="/" class="inline-block text-sm font-bold text-amber-400 hover:underline">← Voltar ao catálogo</a>
+
+    @if (database.carregandoFilme()) {
+      <p class="py-16 text-center text-sm text-zinc-500">Carregando detalhes...</p>
+    } @else if (database.filmeSelecionado(); as filme) {
+      <article class="flex flex-col gap-6 rounded-xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-2xl md:flex-row">
+        <div class="aspect-[2/3] w-full overflow-hidden rounded-lg border border-zinc-800 bg-black md:w-64 md:flex-shrink-0">
+          @if (filme.imagemUrl) {
+            <img [src]="filme.imagemUrl" [alt]="filme.titulo" class="h-full w-full object-cover" />
+          } @else {
+            <div class="flex h-full w-full items-center justify-center text-xs font-bold uppercase text-zinc-600">
+              Sem capa
+            </div>
+          }
+        </div>
+
+        <div class="flex flex-1 flex-col justify-between gap-6">
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+              <span class="rounded bg-zinc-800 px-2 py-1 font-bold uppercase tracking-wider text-amber-400">
+                {{ filme.genero || 'Sem gênero' }}
+              </span>
+              <span>{{ filme.ano || 'Ano não informado' }}</span>
+            </div>
+
+            <h1 class="text-3xl font-black leading-tight tracking-tight">{{ filme.titulo }}</h1>
+
+            <p class="text-sm leading-relaxed text-zinc-300">
+              {{ filme.sinopse || 'Sem sinopse disponível para este título.' }}
+            </p>
+          </div>
+
+          <div class="flex items-center justify-between border-t border-zinc-800 pt-4">
+            @if (database.isLoggedIn()) {
+              <button
+                type="button"
+                (click)="removerFilme(filme.id)"
+                class="rounded border border-red-800/50 bg-red-950/40 px-4 py-2 text-xs font-bold text-red-400 hover:bg-red-900/60"
+              >
+                Excluir do Supabase
+              </button>
+            } @else {
+              <span class="text-xs text-zinc-500">Entre para excluir este filme.</span>
+            }
+
+            <span class="font-mono text-[10px] text-zinc-500">ID: {{ filme.id }}</span>
+          </div>
+        </div>
+      </article>
+    } @else {
+      <div class="rounded-xl border border-dashed border-zinc-800 p-12 text-center">
+        <p class="text-sm text-zinc-500">Filme não encontrado.</p>
+        <a routerLink="/" class="mt-3 inline-block text-sm font-bold text-amber-400 hover:underline">
+          Voltar ao catálogo
+        </a>
+      </div>
+    }
+  </div>
+</div>
