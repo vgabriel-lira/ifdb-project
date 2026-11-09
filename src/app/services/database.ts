@@ -1,12 +1,10 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Service, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { Cliente, Filme } from '../models/filme';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Service()
 export class Database {
   private readonly http = inject(HttpClient);
   private readonly storageKey = 'ifdb_usuario';
