@@ -22,16 +22,16 @@ export class FilmeDetail implements OnInit {
     });
   }
 
-  async removerFilme(id: number): Promise<void> {
+  removerFilme(id: number): void {
     if (!confirm('Deseja excluir este filme do catálogo?')) {
       return;
     }
 
-    const sucesso = await this.database.deleteFilmeSupabase(id);
-    if (sucesso) {
-      this.router.navigate(['/']);
-    } else {
-      alert('Não foi possível excluir o filme. Tente novamente.');
-    }
+    this.database.deleteFilmeSupabase(id).subscribe({
+      next: () => this.router.navigate(['/']),
+      error: () => {
+        alert('Não foi possível excluir o filme. Tente novamente.');
+      }
+    });
   }
 }

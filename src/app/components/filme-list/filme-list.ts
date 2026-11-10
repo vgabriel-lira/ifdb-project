@@ -68,15 +68,16 @@ export class FilmeList {
     this.router.navigate(['/filme', id]);
   }
 
-  async removerFilme(id: number): Promise<void> {
+  removerFilme(id: number): void {
     if (!confirm('Deseja excluir este filme do catálogo?')) {
       return;
     }
 
-    const sucesso = await this.database.deleteFilmeSupabase(id);
-    if (!sucesso) {
-      alert('Não foi possível excluir o filme. Tente novamente.');
-    }
+    this.database.deleteFilmeSupabase(id).subscribe({
+      error: () => {
+        alert('Não foi possível excluir o filme. Tente novamente.');
+      }
+    });
   }
 
   sair(): void {
