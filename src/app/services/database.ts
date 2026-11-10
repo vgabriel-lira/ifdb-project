@@ -1,6 +1,6 @@
 import { Service, computed, inject, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { Observable, finalize, map, tap } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { Cliente, Filme } from '../models/filme';
 
@@ -41,54 +41,46 @@ export class Database {
     }
   }
 
-  async cadastrarCliente(cliente: { nome: string; email: string; pass: string }): Promise<boolean> {
+  cadastrarCliente(cliente: { nome: string; email: string; pass: string }): Observable<unknown> {
     this.isSaving.set(true);
-    try {
-      await firstValueFrom(
-        this.http.post(
-          `${environment.supabaseRestUrl}/clientes`,
-          {
-            nome: cliente.nome.trim(),
-            email: cliente.email.trim().toLowerCase(),
-            senha: cliente.pass
-          },
-          { headers: this.headers }
-        )
+
+    return this.http
+      .post(
+        `${environment.supabaseRestUrl}/clientes`,
+        {
+          nome: cliente.nome.trim(),
+          email: cliente.email.trim().toLowerCase(),
+          senha: cliente.pass
+        },
+        { headers: this.headers }
+      )
+      .pipe(
+        tap({ error: (err) => console.error('Erro POST cliente:', err) }),
+        finalize(() => this.isSaving.set(false))
       );
-      return true;
-    } catch (err) {
-      console.error('Erro POST cliente:', err);
-      return false;
-    } finally {
-      this.isSaving.set(false);
-    }
   }
 
-  async fazerLogin(credenciais: { email: string; pass: string }): Promise<boolean> {
+  fazerLogin(credenciais: { email: string; pass: string }): Observable<Cliente | null> {
     this.isSaving.set(true);
-    try {
-      const email = credenciais.email.trim().toLowerCase();
-      const url =
-        `${environment.supabaseRestUrl}/clientes` +
-        `?email=ilike.${encodeURIComponent(email)}` +
-        `&senha=eq.${encodeURIComponent(credenciais.pass)}` +
-        `&select=id,nome,email`;
 
-      const resultado = await firstValueFrom(this.http.get<Cliente[]>(url, { headers: this.headers }));
-      const cliente = resultado?.[0];
-      if (!cliente) {
-        return false;
-      }
+    const email = credenciais.email.trim().toLowerCase();
+    const url =
+      `${environment.supabaseRestUrl}/clientes` +
+      `?email=ilike.${encodeURIComponent(email)}` +
+      `&senha=eq.${encodeURIComponent(credenciais.pass)}` +
+      `&select=id,nome,email`;
 
-      this.usuarioLogado.set(cliente);
-      localStorage.setItem(this.storageKey, JSON.stringify(cliente));
-      return true;
-    } catch (err) {
-      console.error('Erro GET login:', err);
-      return false;
-    } finally {
-      this.isSaving.set(false);
-    }
+    return this.http.get<Cliente[]>(url, { headers: this.headers }).pipe(
+      map((resultado) => resultado?.[0] ?? null),
+      tap((cliente) => {
+        if (cliente) {
+          this.usuarioLogado.set(cliente);
+          localStorage.setItem(this.storageKey, JSON.stringify(cliente));
+        }
+      }),
+      tap({ error: (err) => console.error('Erro GET login:', err) }),
+      finalize(() => this.isSaving.set(false))
+    );
   }
 
   logout(): void {
@@ -123,37 +115,30 @@ export class Database {
       });
   }
 
-  async addFilmeSupabase(novoFilme: Omit<Filme, 'id'>): Promise<boolean> {
+  addFilmeSupabase(novoFilme: Omit<Filme, 'id'>): Observable<Filme[]> {
     this.isSaving.set(true);
-    try {
-      const resposta = await firstValueFrom(
-        this.http.post<Filme[]>(`${environment.supabaseRestUrl}/filmes`, novoFilme, { headers: this.headers })
-      );
 
-      if (resposta?.[0]) {
-        this.filmes.update((lista) => [...lista, resposta[0]]);
-      } else {
-        this.carregarFilmes();
-      }
-      return true;
-    } catch (err) {
-      console.error('Erro POST filme:', err);
-      return false;
-    } finally {
-      this.isSaving.set(false);
-    }
+    return this.http
+      .post<Filme[]>(`${environment.supabaseRestUrl}/filmes`, novoFilme, { headers: this.headers })
+      .pipe(
+        tap((resposta) => {
+          if (resposta?.[0]) {
+            this.filmes.update((lista) => [...lista, resposta[0]]);
+          } else {
+            this.carregarFilmes();
+          }
+        }),
+        tap({ error: (err) => console.error('Erro POST filme:', err) }),
+        finalize(() => this.isSaving.set(false))
+      );
   }
 
-  async deleteFilmeSupabase(id: number): Promise<boolean> {
-    try {
-      await firstValueFrom(
-        this.http.delete(`${environment.supabaseRestUrl}/filmes?id=eq.${id}`, { headers: this.headers })
+  deleteFilmeSupabase(id: number): Observable<unknown> {
+    return this.http
+      .delete(`${environment.supabaseRestUrl}/filmes?id=eq.${id}`, { headers: this.headers })
+      .pipe(
+        tap(() => this.filmes.update((lista) => lista.filter((filme) => filme.id !== id))),
+        tap({ error: (err) => console.error('Erro DELETE filme:', err) })
       );
-      this.filmes.update((lista) => lista.filter((filme) => filme.id !== id));
-      return true;
-    } catch (err) {
-      console.error('Erro DELETE filme:', err);
-      return false;
-    }
   }
 }
