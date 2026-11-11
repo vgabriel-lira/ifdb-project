@@ -16,6 +16,7 @@ export class FilmeList {
 
   public categoriaSelecionada = signal('Todos');
   public busca = signal('');
+  public destaque = computed(() => this.database.filmes()[0] ?? null);
 
   public categorias = computed(() => {
     const nomes = new Set<string>();
@@ -43,8 +44,6 @@ export class FilmeList {
       return combinaCategoria && combinaBusca;
     });
   });
-
-  public destaque = computed(() => this.filmesFiltrados()[0] ?? null);
 
   selecionarCategoria(categoria: string): void {
     this.categoriaSelecionada.set(categoria);

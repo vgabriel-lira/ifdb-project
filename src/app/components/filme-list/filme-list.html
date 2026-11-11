@@ -89,7 +89,7 @@
     @if (destaque(); as filme) {
       <section class="grid gap-6 rounded-xl border border-zinc-800 bg-gradient-to-r from-zinc-900 to-zinc-950 p-6 md:grid-cols-[1fr_200px] md:items-center">
         <div>
-          <p class="text-xs font-bold uppercase tracking-widest text-amber-400">Destaques</p>
+          <p class="text-xs font-bold uppercase tracking-widest text-amber-400">Destaque da semana</p>
           <h1 class="mt-1 text-3xl font-black tracking-tight">{{ filme.titulo }}</h1>
           <p class="mt-1 text-xs font-semibold uppercase text-zinc-400">
             {{ filme.genero || 'Sem gênero' }} · {{ filme.ano || '—' }}
@@ -116,7 +116,7 @@
       </section>
     } @else {
       <section class="rounded-xl border border-zinc-800 bg-gradient-to-r from-zinc-900 to-zinc-950 p-6">
-        <p class="text-xs font-bold uppercase tracking-widest text-amber-400">Destaques</p>
+        <p class="text-xs font-bold uppercase tracking-widest text-amber-400">Destaque da semana</p>
         <h1 class="mt-1 text-3xl font-black tracking-tight">Bem-vindo ao IFDb</h1>
         <p class="mt-2 max-w-2xl text-sm text-zinc-400">
           Explore o catálogo e, com uma conta, cadastre e remova filmes do banco de dados Supabase.
@@ -200,56 +200,11 @@
 
       <div class="md:text-right">
         <h3 class="text-sm font-bold text-zinc-300">Redes sociais</h3>
-        <div class="mt-3 flex gap-3 md:justify-end">
-          <a
-            href="#"
-            (click)="$event.preventDefault()"
-            aria-label="Instagram"
-            title="Instagram"
-            class="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-700 text-zinc-400 transition-colors hover:border-amber-400 hover:text-amber-400"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-5 w-5">
-              <rect x="3" y="3" width="18" height="18" rx="5"></rect>
-              <circle cx="12" cy="12" r="4"></circle>
-              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle>
-            </svg>
-          </a>
-
-          <a
-            href="#"
-            (click)="$event.preventDefault()"
-            aria-label="Facebook"
-            title="Facebook"
-            class="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-700 text-zinc-400 transition-colors hover:border-amber-400 hover:text-amber-400"
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
-              <path d="M14 8h3V4h-3c-2.76 0-5 2.24-5 5v3H6v4h3v8h4v-8h3l1-4h-4V9c0-.55.45-1 1-1z"></path>
-            </svg>
-          </a>
-
-          <a
-            href="#"
-            (click)="$event.preventDefault()"
-            aria-label="X"
-            title="X"
-            class="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-700 text-zinc-400 transition-colors hover:border-amber-400 hover:text-amber-400"
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
-              <path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3l-4.9-6.4L6.4 22H3.3l7.3-8.3L2.8 2h6.4l4.4 5.8L18.9 2zm-1.1 18h1.7L7.3 3.9H5.5L17.8 20z"></path>
-            </svg>
-          </a>
-
-          <a
-            href="#"
-            (click)="$event.preventDefault()"
-            aria-label="YouTube"
-            title="YouTube"
-            class="flex h-9 w-9 items-center justify-center rounded-full border border-zinc-700 text-zinc-400 transition-colors hover:border-amber-400 hover:text-amber-400"
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
-              <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"></path>
-            </svg>
-          </a>
+        <div class="mt-3 flex flex-wrap gap-4 text-xs text-zinc-400 md:justify-end">
+          <a href="#" (click)="$event.preventDefault()">Instagram</a>
+          <a href="#" (click)="$event.preventDefault()">Facebook</a>
+          <a href="#" (click)="$event.preventDefault()">X</a>
+          <a href="#" (click)="$event.preventDefault()">YouTube</a>
         </div>
       </div>
     </div>
